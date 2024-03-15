@@ -22,7 +22,22 @@ int main(int argc, char *argv[])
 
 	//std::cout << create_port_declaration_from_line("wire UInt64 a, b, c, clk, r1, r2");
 
-	std::cout << determine_module(split_string("d = a - 1"));
+	//std::cout << determine_module(split_string("d = a - 1"));
+
+	/*
+	std::cout << write_input_list(split_string("c = a + b"), "ADD") << "\n";
+	std::cout << write_input_list(split_string("gEQz = g == zero"), "COMP==") << "\n";
+	std::cout << write_input_list(split_string("zwire - gEQz ? e : f"), "MUX2x1") << "\n";
+	std::cout << write_input_list(split_string("z = zwire"), "REG") << "\n";
+	*/
+
+	/*
+	std::cout << create_module_instance_from_line("c = a + b", 1) << "\n";
+	std::cout << create_module_instance_from_line("gEQz = g == zero", 2) << "\n";
+	std::cout << create_module_instance_from_line("zwire - gEQz ? e : f", 3) << "\n";
+	std::cout << create_module_instance_from_line("z = zwire", 4) << "\n";
+	std::cout << create_module_instance_from_line("z = g << dLTe", 5) << "\n";
+	*/
 
 	return 0;
 }

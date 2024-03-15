@@ -104,10 +104,12 @@ std::string create_module_instance_from_line(std::string line, int line_num)
 	veri_line += module_type;
 
 	// Generate a unique name for the instantiation of the module
-	veri_line += " " + module_type[0] + std::to_string(line_num);
+	veri_line += " " + module_type.substr(0, 1) + std::to_string(line_num);
 
-	// TODO: Write function to write inputs correctly
+	// Generate list of inputs/outputs/wires
+	veri_line += write_input_list(split_line, module_type);
 
+	veri_line += ";";
 	return veri_line;
 }
 
@@ -147,6 +149,43 @@ std::string determine_module(std::vector<std::string> split_line)
 			return "ERROR";
 		}
 	}
+}
+
+std::string write_input_list(std::vector<std::string> split_line, std::string module_type)
+{
+	std::string input_list = "(";
+
+	if (module_type.compare("REG") == 0)
+	{
+		input_list += "Clk, Rst, " + split_line[2] + ", " + split_line[0];
+	}
+	else if (module_type.compare("COMP>") == 0)
+	{
+		input_list += split_line[2] + ", " + split_line[4] + ", " + split_line[0] + " _, _";
+	}
+	else if (module_type.compare("COMP<") == 0)
+	{
+		input_list += split_line[2] + ", " + split_line[4] + ", _," + split_line[0] + ", _";
+	}
+	else if (module_type.compare("COMP==") == 0)
+	{
+		input_list += split_line[2] + ", " + split_line[4] + " _, _, " + split_line[0];
+	}
+	else if (module_type.compare("MUX2x1") == 0)
+	{
+		input_list += split_line[2] + ", " + split_line[4] + ", " + split_line[6] + ", " + split_line[0];
+	}
+	else if (module_type.compare("INC") == 0 || module_type.compare("DEC") == 0)
+	{
+		input_list += split_line[2] + ", " + split_line[0];
+	}
+	else 
+	{
+		input_list += split_line[2] + ", " + split_line[4] + ", " + split_line[0];
+	}
+
+	input_list += ")";
+	return input_list;
 }
 
 /*
