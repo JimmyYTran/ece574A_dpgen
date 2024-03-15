@@ -142,6 +142,10 @@ std::string determine_module(std::vector<std::string> split_line)
 			int index = it - OPERATIONS.begin();
 			return MODULES[index];
 		}
+		else 
+		{
+			return "ERROR";
+		}
 	}
 }
 
