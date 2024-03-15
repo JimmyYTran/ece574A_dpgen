@@ -24,7 +24,7 @@ std::vector<std::string> convert_lines_to_verilog(std::vector<std::string> lines
 
 	while (line_index < lines.size() && lines[line_index].find("=") == std::string::npos)
 	{
-		verilog_lines.push_back(create_port_declaration_from_line(lines[line_index], inputs, outputs));
+		verilog_lines.push_back("\t" + create_port_declaration_from_line(lines[line_index], inputs, outputs));
 		line_index++;
 	}
 
@@ -32,7 +32,7 @@ std::vector<std::string> convert_lines_to_verilog(std::vector<std::string> lines
 
 	while (line_index < lines.size())
 	{
-		verilog_lines.push_back(create_module_instance_from_line(lines[line_index], line_index));
+		verilog_lines.push_back("\t" + create_module_instance_from_line(lines[line_index], line_index));
 		line_index++;
 	}
 
@@ -160,7 +160,7 @@ std::string create_module_instance_from_line(std::string line, int line_num)
 
 	// Determine the module to instantiate
 	std::string module_type = determine_module(split_line);
-	veri_line += module_type;
+	veri_line += module_type.substr(0, module_type.find_first_of("><+"));
 
 	// Generate a unique name for the instantiation of the module
 	veri_line += " " + module_type.substr(0, 1) + std::to_string(line_num);
