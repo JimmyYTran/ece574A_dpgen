@@ -17,6 +17,7 @@ std::vector<std::string> read_file_to_strings(std::string filename)
 				file_lines.push_back(line);
 			}
 		}
+		input_file.close();
 	}
 	else
 	{
@@ -26,7 +27,21 @@ std::vector<std::string> read_file_to_strings(std::string filename)
 	return file_lines;
 }
 
-void write_strings_to_file(std::vector<std::string> strings, std::string filename)
+void write_strings_to_file(std::vector<std::string> lines, std::string filename)
 {
-	// TODO
+	std::ofstream output_file;
+	output_file.open(filename);
+
+	if (output_file.is_open())
+	{
+		for (std::string line : lines)
+		{
+			output_file << line;
+		}
+		output_file.close();
+	}
+	else
+	{
+		std::cout << "Unable to open file.";
+	}
 }
