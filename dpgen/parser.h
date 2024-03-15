@@ -13,11 +13,17 @@ std::vector<std::string>{ "*", ">", "<", "==", "?", ">>", "<<", "/", "%" };
 static const std::vector<std::string> MODULES = 
 std::vector<std::string>{ "MUL", "COMP>", "COMP<", "COMP==", "MUX2x1", "SHR", "SHL", "DIV", "MOD" };
 
-std::vector<std::string> convert_lines_to_verilog(std::vector<std::string>);
+std::vector<std::string> convert_lines_to_verilog(std::vector<std::string>, std::string filename);
 
 std::string strip_comment_from_line(std::string line);
 
-std::string create_port_declaration_from_line(std::string line);
+std::vector<std::string> remove_empty_lines(std::vector<std::string> lines);
+
+std::string write_module_definition
+(std::vector<std::string> inputs, std::vector<std::string> outputs, std::string circuit_name);
+
+std::string create_port_declaration_from_line
+(std::string line, std::vector<std::string>& inputs, std::vector<std::string>& outputs);
 
 std::string create_module_instance_from_line(std::string line, int line_num);
 
