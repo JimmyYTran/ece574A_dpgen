@@ -3,6 +3,7 @@ set(PROJECT_SOURCES
     fileio.cpp
     Operation.cpp
     parser.cpp
+    graph.cpp
 )
 
 add_library(dpgen_lib ${PROJECT_SOURCES})
