@@ -7,29 +7,6 @@
 #include <string>
 #include <vector>
 
-class Data 
-{
-private:
-	std::string name;
-	int datawidth;
-	bool is_signed;
-public:
-	std::string get_name() { return name; }
-	int get_datawidth() { return datawidth; }
-	bool is_signed() { return is_signed; }
-};
-
-class Operation {
-private:
-	std::string name;
-	std::vector<Data> inputs;
-	Data output;
-public:
-	std::string get_name() { return name; }
-	std::vector<Data> get_inputs() { return inputs; }
-	Data get_outputs() { return output; }
-};
-
 static const std::vector<std::string> OPERATIONS =
 std::vector<std::string>{ "*", ">", "<", "==", "?", ">>", "<<", "/", "%" };
 
