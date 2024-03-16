@@ -10,7 +10,7 @@ if ( CMAKE_COMPILER_IS_GNUCC )
 endif( CMAKE_COMPILER_IS_GNUCC )
 if ( MSVC )
     message("MSVC compiler flags enabled...")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Werror -std=gnu++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 endif( MSVC )
 
 set(CMAKE_CXX_STANDARD 17)
