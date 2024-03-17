@@ -301,15 +301,15 @@ std::string write_input_list(Operation operation)
 	}
 
 	// Add the output, but be extra careful with COMP
-	if (op_output.get_name().compare("COMP>") == 0)
+	if (operation.get_name().compare("COMP>") == 0)
 	{
 		input_list += op_output.get_name() + ", _, _";
 	}
-	else if (op_output.get_name().compare("COMP<") == 0)
+	else if (operation.get_name().compare("COMP<") == 0)
 	{
 		input_list += "_, " + op_output.get_name() + ", _";
 	}
-	else if (op_output.get_name().compare("COMP==") == 0)
+	else if (operation.get_name().compare("COMP==") == 0)
 	{
 		input_list += "_, _, " + op_output.get_name();
 	}
