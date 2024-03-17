@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/rpgol/Downloads/ece574A_dpgen
+# Install script for directory: C:/Users/Jimmy/Documents/School/ECE574A/HW2/ece574A_dpgen
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/rpgol/Downloads/ece574A_dpgen/build/dpgen/cmake_install.cmake")
+  include("C:/Users/Jimmy/Documents/School/ECE574A/HW2/ece574A_dpgen/build/dpgen/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/rpgol/Downloads/ece574A_dpgen/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/Jimmy/Documents/School/ECE574A/HW2/ece574A_dpgen/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -1,4 +1,4 @@
-C:/Users/rpgol/Downloads/ece574A_dpgen/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/rpgol/Downloads/ece574A_dpgen/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/rpgol/Downloads/ece574A_dpgen/build/dpgen/CMakeFiles/dpgen_lib.dir
-C:/Users/rpgol/Downloads/ece574A_dpgen/build/dpgen/CMakeFiles/dpgen.dir
+C:/Users/Jimmy/Documents/School/ECE574A/HW2/ece574A_dpgen/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Jimmy/Documents/School/ECE574A/HW2/ece574A_dpgen/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/Jimmy/Documents/School/ECE574A/HW2/ece574A_dpgen/build/dpgen/CMakeFiles/dpgen_lib.dir
+C:/Users/Jimmy/Documents/School/ECE574A/HW2/ece574A_dpgen/build/dpgen/CMakeFiles/dpgen.dir

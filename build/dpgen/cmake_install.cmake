@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/rpgol/Downloads/ece574A_dpgen/dpgen
+# Install script for directory: C:/Users/Jimmy/Documents/School/ECE574A/HW2/ece574A_dpgen/dpgen
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

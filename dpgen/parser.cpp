@@ -168,14 +168,16 @@ std::string create_module_instance_from_line
 	// Determine the module to instantiate
 	std::string module_type = determine_module(split_line);
 
-	operations.push_back(parse_line_to_operation(split_line, module_type, ports));
+	// Keep track of the module, then concatenate to the verilog line
+	Operation current_op = parse_line_to_operation(split_line, module_type, ports);
+	operations.push_back(current_op);
 	veri_line += module_type.substr(0, module_type.find_first_of("><+"));
 
 	// Generate a unique name for the instantiation of the module
 	veri_line += " " + module_type.substr(0, 1) + std::to_string(line_num);
 
 	// Generate list of inputs/outputs/wires
-	veri_line += write_input_list(split_line, module_type);
+	veri_line += write_input_list(current_op);
 
 	veri_line += ";";
 	return veri_line;
@@ -238,6 +240,7 @@ Operation parse_line_to_operation
 	int output_index = find_port(ports, split_line[0]);
 	new_op.set_output(ports[output_index]);
 
+	// Add the inputs for the new operation
 	if (module_type.compare("REG") == 0)
 	{
 		input_index = find_port(ports, split_line[2]);
@@ -250,6 +253,20 @@ Operation parse_line_to_operation
 		Data rst_input = Data("Rst", "input", 1, false);
 		ports.push_back(rst_input);
 		new_op.add_input(rst_input);
+	}
+	else if (module_type.compare("MUX2x1") == 0)
+	{
+		// MUX inputs need to be read in a slightly different order
+		for (int i = 4; i < split_line.size(); i = i + 2)
+		{
+			input_index = find_port(ports, split_line[i]);
+			ports.push_back(ports[input_index]);
+			new_op.add_input(ports[input_index]);
+		}
+		// Adding the select input
+		input_index = find_port(ports, split_line[2]);
+		ports.push_back(ports[input_index]);
+		new_op.add_input(ports[input_index]);
 	}
 	else
 	{
@@ -267,41 +284,38 @@ Operation parse_line_to_operation
 /*
 * Writes a list of inputs for the module.
 *
-* split_line: a vector of strings containing a line split from a netlist file.
-* module_type: operation that the module performs, corresponding to MODULES.
+* operation: Operation instance with associated name, inputs, and outputs.
 * Returns a string for the input list.
 */
-std::string write_input_list(std::vector<std::string> split_line, std::string module_type)
+std::string write_input_list(Operation operation)
 {
+	std::vector<Data> op_inputs = operation.get_inputs();
+	Data op_output = operation.get_output();
+
 	std::string input_list = "(";
 
-	if (module_type.compare("REG") == 0)
+	// Add all of the inputs to the input list first
+	for (Data op_in : op_inputs)
 	{
-		input_list += "Clk, Rst, " + split_line[2] + ", " + split_line[0];
+		input_list += op_in.get_name() + ", ";
 	}
-	else if (module_type.compare("COMP>") == 0)
+
+	// Add the output, but be extra careful with COMP
+	if (op_output.get_name().compare("COMP>") == 0)
 	{
-		input_list += split_line[2] + ", " + split_line[4] + ", " + split_line[0] + " _, _";
+		input_list += op_output.get_name() + ", _, _";
 	}
-	else if (module_type.compare("COMP<") == 0)
+	else if (op_output.get_name().compare("COMP<") == 0)
 	{
-		input_list += split_line[2] + ", " + split_line[4] + ", _," + split_line[0] + ", _";
+		input_list += "_, " + op_output.get_name() + ", _";
 	}
-	else if (module_type.compare("COMP==") == 0)
+	else if (op_output.get_name().compare("COMP==") == 0)
 	{
-		input_list += split_line[2] + ", " + split_line[4] + " _, _, " + split_line[0];
-	}
-	else if (module_type.compare("MUX2x1") == 0)
-	{
-		input_list += split_line[2] + ", " + split_line[4] + ", " + split_line[6] + ", " + split_line[0];
-	}
-	else if (module_type.compare("INC") == 0 || module_type.compare("DEC") == 0)
-	{
-		input_list += split_line[2] + ", " + split_line[0];
+		input_list += "_, _, " + op_output.get_name();
 	}
 	else
 	{
-		input_list += split_line[2] + ", " + split_line[4] + ", " + split_line[0];
+		input_list += op_output.get_name();
 	}
 
 	input_list += ")";
