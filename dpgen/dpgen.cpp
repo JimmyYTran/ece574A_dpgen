@@ -1,19 +1,33 @@
 #include "fileio.h"
 #include "parser.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	// TODO: Use argc and argv
 	std::vector<std::string> file_lines = read_file_to_strings("474a_circuit1.txt");
 
-    std::vector<Operation> operations;
+	std::vector<Operation> operations;
 	std::vector<std::string> output_lines = parse_netlist_lines(file_lines, "Circuit1", operations);
 
 	for (std::string line : output_lines)
 	{
 		std::cout << line + "\n";
 	}
-	
+
+	std::cout << "\n";
+
+	for (Operation a_op : operations)
+	{
+		std::cout << a_op.get_name() << "\n";
+		std::cout << "Output: " << a_op.get_output().get_name() << "\n";
+		for (Data a_input : a_op.get_inputs())
+		{
+			std::cout << "Input: " << a_input.get_name() << "\n";
+		}
+
+		std::cout << "\n";
+	}
+
 	/*
 	std::vector<std::string> inputs;
 	std::vector<std::string> outputs;

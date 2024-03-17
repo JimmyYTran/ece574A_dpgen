@@ -4,8 +4,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <string>
-#include <vector>
 
 #include "Operation.h"
 
@@ -26,7 +24,8 @@ std::string write_module_definition(std::vector<Data> ports, std::string circuit
 
 std::string create_port_declaration_from_line(std::string line, std::vector<Data>& ports);
 
-std::string create_module_instance_from_line(std::string line, int line_num);
+std::string create_module_instance_from_line
+(std::string line, int line_num, std::vector<Data> ports, std::vector<Operation>& operations);
 
 std::string determine_module(std::vector<std::string>);
 
