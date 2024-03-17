@@ -36,7 +36,7 @@ void write_strings_to_file(std::vector<std::string> lines, std::string filename)
 	{
 		for (std::string line : lines)
 		{
-			output_file << line;
+			output_file << line << "\n";
 		}
 		output_file.close();
 	}

@@ -14,6 +14,8 @@ int main(int argc, char* argv[])
 		std::cout << line + "\n";
 	}
 
+	write_strings_to_file(output_lines, "test_out_circuit1.txt");
+
 	std::cout << "\n";
 
 	for (Operation a_op : operations)

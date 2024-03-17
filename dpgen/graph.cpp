@@ -76,3 +76,78 @@ std::vector<Node> create_graph(std::vector<Operation> ops) {
     }
     return nodes;
 }
+
+/*
+std::vector<Node*> do_topological_sort(std::vector<Node> graph)
+{
+    int num_nodes = graph.size();
+    // Sort nodes by their dependencies (this should technically be a stack but eh)
+    std::vector<Node*> sorted_nodes;
+
+    // First, get all nodes that don't have inputs
+    for (Node current_node : graph)
+    {
+        if (current_node.inputs.size() == 0)
+        {
+            sorted_nodes.push_back(&current_node);
+        }
+    }
+
+    // Then, add nodes to sorted_nodes as long as all the node's inputs are covered
+    bool is_not_dependent = true;
+    while (sorted_nodes.size() != num_nodes)
+    {
+        for (Node current_node : graph)
+        {
+            // Check that all inputs are in the sorted_nodes
+            for (Node* in_p : current_node.inputs)
+            {
+                // If input node is not found in sorted_nodes, move on
+                if (is_not_dependent &&
+                    std::find(sorted_nodes.begin(), sorted_nodes.end(), in_p) == sorted_nodes.end())
+                {
+                    is_not_dependent = false;
+                }
+            }
+
+            // If all input nodes are in sorted_node, then the current_node has no dependencies
+            if (is_not_dependent) {
+                sorted_nodes.push_back(&current_node);
+            }
+
+            // Reset the dependency check flag
+            is_not_dependent = true;
+        }
+    }
+
+    return sorted_nodes;
+}
+
+float calculate_critical_path(std::vector<Node> graph)
+{
+    std::vector<Node*> sorted_nodes = do_topological_sort(graph);
+
+    float max_weight = 0.0;
+    float critical_path = 0.0;
+
+    for (Node* node_p : sorted_nodes)
+    {
+        Node current_Node = *node_p;
+
+        for (Node* input : current_Node.inputs)
+        {
+            Node current_input = *input;
+            if (current_input.weight > max_weight)
+            {
+                max_weight = current_input.weight;
+            }
+        }
+
+        // TODO: PLEASE check that the dereferenced pointer works here, should overwrite old weight
+        // Add the node's current weight to the largest input weight
+        current_Node.weight += max_weight;
+    }
+
+    // TODO: Check nodes without outputs: node with largest weight will have the critical path
+}
+*/

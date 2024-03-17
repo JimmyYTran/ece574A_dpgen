@@ -1,3 +1,6 @@
+#ifndef GRAPH_H
+#define GRAPH_H
+
 #include "Operation.h"
 #include <vector>
 
@@ -11,3 +14,5 @@ struct Node {
     std::vector<Node*> outputs;
     double weight;
 };
+
+#endif
