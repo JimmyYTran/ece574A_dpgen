@@ -32,7 +32,7 @@ std::string determine_module(std::vector<std::string>);
 Operation parse_line_to_operation
 (std::vector<std::string> split_line, std::string module_type, std::vector<Data>& ports);
 
-std::string write_input_list(std::vector<std::string> split_line, std::string module_type);
+std::string write_input_list(Operation operation);
 
 std::vector<std::string> split_string(std::string line);
 
