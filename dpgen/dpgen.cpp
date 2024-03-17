@@ -6,7 +6,8 @@ int main(int argc, char *argv[])
 	// TODO: Use argc and argv
 	std::vector<std::string> file_lines = read_file_to_strings("474a_circuit1.txt");
 
-	std::vector<std::string> output_lines = convert_lines_to_verilog(file_lines, "Circuit1");
+    std::vector<Operation> operations;
+	std::vector<std::string> output_lines = parse_netlist_lines(file_lines, "Circuit1", operations);
 
 	for (std::string line : output_lines)
 	{

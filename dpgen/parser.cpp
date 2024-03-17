@@ -2,15 +2,18 @@
 
 /*
 * Convert lines from a behavioral netlist to lines in structural Verilog.
+* Additionally, keeps track of each operation and its inputs and outputs.
 * 
-* lines: vector of strings containing lines read from a netlist file
+* lines: vector of strings containing lines read from a netlist file.
+* filename: string containing the filename, used for creating a circuit name.
+* operations: vector of Operations to keep track of each operation.
 * Returns a vector of strings, with each string being a line of Verilog.
 */
-std::vector<std::string> convert_lines_to_verilog(std::vector<std::string> lines, std::string filename)
+std::vector<std::string> parse_netlist_lines
+(std::vector<std::string> lines, std::string filename, std::vector<Operation>& operations)
 {
 	std::vector<std::string> verilog_lines;
 
-	// TODO: Fix this
 	for (int i = 0; i < lines.size(); i++)
 	{
 		lines[i] = strip_comment_from_line(lines[i]);
@@ -19,16 +22,14 @@ std::vector<std::string> convert_lines_to_verilog(std::vector<std::string> lines
 	lines = remove_empty_lines(lines);
 
 	int line_index = 0;
-	std::vector<std::string> inputs;
-	std::vector<std::string> outputs;
+	std::vector<Data> ports;
 
+	// Write the port declarations, while also keeping track of inputs/outputs/wires
 	while (line_index < lines.size() && lines[line_index].find("=") == std::string::npos)
 	{
-		verilog_lines.push_back("\t" + create_port_declaration_from_line(lines[line_index], inputs, outputs));
+		verilog_lines.push_back("\t" + create_port_declaration_from_line(lines[line_index], ports));
 		line_index++;
 	}
-
-	verilog_lines.insert(verilog_lines.begin(), write_module_definition(inputs, outputs, filename));
 
 	while (line_index < lines.size())
 	{
@@ -36,6 +37,7 @@ std::vector<std::string> convert_lines_to_verilog(std::vector<std::string> lines
 		line_index++;
 	}
 
+	verilog_lines.insert(verilog_lines.begin(), write_module_definition(ports, filename));
 	verilog_lines.insert(verilog_lines.begin(), "`timescale 1ns / 1ps");
 	verilog_lines.push_back("endmodule");
 
@@ -46,7 +48,7 @@ std::vector<std::string> convert_lines_to_verilog(std::vector<std::string> lines
 * Removes comments from a line from a behavioral netlist.
 * 
 * line: a string containing a line from a netlist file.
-* Returns the same string without comments.
+* Returns the string without comments.
 */
 std::string strip_comment_from_line(std::string line)
 {
@@ -54,6 +56,12 @@ std::string strip_comment_from_line(std::string line)
 	return line.substr(0, found);
 }
 
+/*
+* Removes empty lines (to catch any lines that were commented out).
+*
+* lines: vector of strings containing lines from a netlist.
+* Returns the vector of strings with empty strings removed.
+*/
 std::vector<std::string> remove_empty_lines(std::vector<std::string> lines)
 {
 	std::vector<std::string> output_lines;
@@ -69,30 +77,24 @@ std::vector<std::string> remove_empty_lines(std::vector<std::string> lines)
 	return output_lines;
 }
 
-std::string write_module_definition
-(std::vector<std::string> inputs, std::vector<std::string> outputs, std::string circuit_name)
+std::string write_module_definition(std::vector<Data> ports, std::string circuit_name)
 {
+	Data current_port;
 	std::string module_def = "module " + circuit_name + "(";
 	
-	for (int i = 0; i < inputs.size(); i++)
+	for (int i = 0; i < ports.size(); i++)
 	{
-		module_def += inputs[i] + ", ";
-	}
-
-	for (int i = 0; i < outputs.size(); i++)
-	{
-		module_def += outputs[i];
-
-		if (i == outputs.size() - 1) 
+		current_port = ports[i];
+		
+		if (current_port.get_datatype().compare("input") == 0 || 
+			current_port.get_datatype().compare("output") == 0)
 		{
-			module_def += ");";
-		}
-		else
-		{
-			module_def += ", ";
+			module_def += current_port.get_name() + ", ";
 		}
 	}
 
+	// Get rid of the last comma and end module header
+	module_def = module_def.substr(0, module_def.find_last_of(",")) + ");";
 	return module_def;
 }
 
@@ -100,32 +102,34 @@ std::string write_module_definition
 * Creates a Verilog port declaration (input, output, wire) from a line from a netlist.
 * 
 * line: a string containing a line from a netlist file.
+* ports: a vector of Data containing inputs, outputs, and wires (used later).
 * Returns a port declaration written in Verilog.
 */
-std::string create_port_declaration_from_line
-(std::string line, std::vector<std::string> &inputs, std::vector<std::string> &outputs)
+std::string create_port_declaration_from_line(std::string line, std::vector<Data>& ports)
 {
 	std::string veri_line = "";
 	std::vector<std::string> split_line = split_string(line);
+	std::string datatype = "";
+	int datawidth = 1;			// datawidth is 1 unless otherwise specified
+	bool is_signed = false;		// port is unsigned unless otherwise specified
+	std::string port_name = "";
 
-	// Determine the type of port
-	if (split_line[0].compare("input") == 0 ||
-		split_line[0].compare("output") == 0 || 
-		split_line[0].compare("wire") == 0)
+	// Determine the type of port (input/output/wire)
+	datatype = split_line[0];
+	veri_line += datatype;
+
+	// Determine if the port is signed
+	if (split_line[1].at(0) != 'U')
 	{
-		veri_line += split_line[0];
-	}
-	else
-	{
-		return "";
+		is_signed = true;
 	}
 
 	// Determine the datawidth of ports defined on this line from the datatype
 	std:size_t it = split_line[1].find_first_of("0123456789");
 	if (it != std::string::npos)
 	{
-		int datawidth = std::stoi(split_line[1].substr(it)) - 1;
-		veri_line += " [" + std::to_string(datawidth) + ":0]";
+		datawidth = std::stoi(split_line[1].substr(it));
+		veri_line += " [" + std::to_string(datawidth - 1) + ":0]";
 	}
 
 	// Appending the inputs/outputs/wires
@@ -133,13 +137,12 @@ std::string create_port_declaration_from_line
 	{
 		veri_line += " " + split_line[i];
 
-		if (split_line[0].compare("input") == 0)
+		port_name = split_line[i].substr(0, split_line[i].find(","));
+
+		// Only add a new port if it hasn't already been added
+		if (find_port(ports, port_name) == -1)
 		{
-			inputs.push_back(split_line[i].substr(0, split_line[i].find(",")));
-		}
-		else if (split_line[0].compare("output") == 0)
-		{
-			outputs.push_back(split_line[i].substr(0, split_line[i].find(",")));
+			ports.push_back(Data(port_name, datatype, datawidth, is_signed));
 		}
 	}
 
@@ -197,10 +200,10 @@ std::string determine_module(std::vector<std::string> split_line)
 	}
 	else
 	{
-		auto it = std::find(OPERATIONS.begin(), OPERATIONS.end(), op);
-		if (it != OPERATIONS.end())
+		auto it = std::find(OPERATION_SYMBOLS.begin(), OPERATION_SYMBOLS.end(), op);
+		if (it != OPERATION_SYMBOLS.end())
 		{
-			int index = it - OPERATIONS.begin();
+			int index = it - OPERATION_SYMBOLS.begin();
 			return MODULES[index];
 		}
 		else 
@@ -208,6 +211,50 @@ std::string determine_module(std::vector<std::string> split_line)
 			return "ERROR";
 		}
 	}
+}
+
+/*
+* Create an Operation instance with inputs and outputs from a line split from a netlist.
+* 
+* split_line: vector of strings from a netlist split line.
+* module_type: string representing the operation type.
+* ports: vector of Data containing all inputs and outputs for the netlist.
+* Returns an Operation instance.
+*/
+Operation parse_line_to_operation
+(std::vector<std::string> split_line, std::string module_type, std::vector<Data>& ports)
+{
+	// Construct a new operation from the module_type
+	Operation new_op = Operation(module_type);
+	int input_index;
+
+	// Set the output for the new operation	
+	int output_index = find_port(ports, split_line[0]);
+	new_op.set_output(ports[output_index]);
+
+	if (module_type.compare("REG") == 0)
+	{
+		input_index = find_port(ports, split_line[2]);
+		new_op.add_input(ports[input_index]);
+
+		// For Clk and Rst, need to add to both new operation and ports (so we can track all inputs)
+		Data clk_input = Data("Clk", "input", 1, false);
+		ports.push_back(clk_input);
+		new_op.add_input(clk_input);
+		Data rst_input = Data("Rst", "input", 1, false);
+		ports.push_back(rst_input);
+		new_op.add_input(rst_input);
+	}
+	else
+	{
+		for (int i = 2; i < split_line.size(); i = i + 2)
+		{
+			input_index = find_port(ports, split_line[i]);
+			ports.push_back(ports[input_index]);
+		}
+	}
+
+	return new_op;
 }
 
 /*
@@ -272,4 +319,23 @@ std::vector<std::string> split_string(std::string line)
 	}
 
 	return split_line;
+}
+
+/*
+* Check if the port (input/output/wire) has already been tracked in the vector of ports.
+* 
+* ports: a vector of Data corresponding to ports (inputs/outputs/wires) from a netlist.
+* Returns the index of the port if found, else -1.
+*/
+int find_port(std::vector<Data> ports, std::string new_port_name)
+{
+	for (int i = 0; i < ports.size(); i++)
+	{
+		if (ports[i].get_name().compare(new_port_name) == 0)
+		{
+			return i;
+		}
+	}
+
+	return -1;
 }
