@@ -125,7 +125,7 @@ std::string create_port_declaration_from_line(std::string line, std::vector<Data
 	}
 
 	// Determine the datawidth of ports defined on this line from the datatype
-	std:size_t it = split_line[1].find_first_of("0123456789");
+	std::size_t it = split_line[1].find_first_of("0123456789");
 	if (it != std::string::npos)
 	{
 		datawidth = std::stoi(split_line[1].substr(it));
