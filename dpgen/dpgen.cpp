@@ -28,7 +28,6 @@ int main(int argc, char* argv[])
 	std::cout << "\n";
 
 	std::vector<Node> netlist_graph = create_graph(operations);
-	std::vector<Node*> sort_netlist_nodes = do_topological_sort(netlist_graph);
 	float critical_path = calculate_critical_path(netlist_graph);
 
 	std::string crit_path = std::to_string(critical_path);
