@@ -131,7 +131,10 @@ std::string create_port_declaration_from_line(std::string line, std::vector<Data
 	if (it != std::string::npos)
 	{
 		datawidth = std::stoi(split_line[1].substr(it));
-		veri_line += " [" + std::to_string(datawidth - 1) + ":0]";
+		if (datawidth > 1)
+		{
+			veri_line += " [" + std::to_string(datawidth - 1) + ":0]";
+		}
 	}
 
 	// Appending the inputs/outputs/wires
