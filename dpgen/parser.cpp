@@ -3,7 +3,7 @@
 /*
 * Convert lines from a behavioral netlist to lines in structural Verilog.
 * Additionally, keeps track of each operation and its inputs and outputs.
-*
+
 * lines: vector of strings containing lines read from a netlist file.
 * filename: string containing the filename, used for creating a circuit name.
 * operations: vector of Operations to keep track of each operation.
@@ -173,11 +173,45 @@ std::string create_module_instance_from_line
 	operations.push_back(current_op);
 	veri_line += module_type.substr(0, module_type.find_first_of("><+"));
 
+	// add that here
+	for (const auto& input : current_op.get_inputs()) {
+		if (input.get_name() == "COMP")
+		{
+
+		}
+	}
+	if (current_op.get_inputs()
+		== "COMP") {
+
+	}
+
+	// op.compare("-") == 0)
+
+	// if data widths are not, append to start of 
+	// go into inputs, check data width, 
+	// if inputs are too small, add 0s
+	// if inputs are too big, trim down the most significant bits
+
+	// add an s in front of the module name if it is signed
+
 	// Generate a unique name for the instantiation of the module
 	veri_line += " " + module_type.substr(0, 1) + std::to_string(line_num);
 
 	// Generate list of inputs/outputs/wires
 	veri_line += write_input_list(current_op);
+
+	/*
+	if (not comparator)
+		current_op.get_output().get_datawidth())
+
+	if (comparator)
+		current_op.get_input().
+
+	// ports = all inputs, outputs, and wires
+	// if module is a comparator (current_op name = "==", ")
+	//	go through current-op inputs
+	// check output
+	*/
 
 	veri_line += ";";
 	return veri_line;

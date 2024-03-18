@@ -77,7 +77,6 @@ std::vector<Node> create_graph(std::vector<Operation> ops) {
     return nodes;
 }
 
-/*
 std::vector<Node*> do_topological_sort(std::vector<Node> graph)
 {
     int num_nodes = graph.size();
@@ -149,5 +148,8 @@ float calculate_critical_path(std::vector<Node> graph)
     }
 
     // TODO: Check nodes without outputs: node with largest weight will have the critical path
+
+    
+    return critical_path;
+
 }
-*/

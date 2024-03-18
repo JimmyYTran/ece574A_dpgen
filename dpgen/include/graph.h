@@ -15,4 +15,11 @@ struct Node {
     double weight;
 };
 
+std::vector<Node> create_graph(std::vector<Operation> ops);
+
+std::vector<Node*> do_topological_sort(std::vector<Node> graph);
+
+float calculate_critical_path(std::vector<Node> graph);
+
+
 #endif
