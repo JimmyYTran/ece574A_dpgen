@@ -2,9 +2,9 @@
 #include "parser.h"
 #include "graph.h"
 
-int main(int argc, char* argv[])
+int main(/*int argc, char* argv[]*/)
 {
-
+	/*
 	if (argc != 3) {
 		std::cerr << "Usage: " << argv[0] << " netlistFile verilogFile" << std::endl;
 		return 1;
@@ -34,6 +34,15 @@ int main(int argc, char* argv[])
 	std::string crit_path = std::to_string(critical_path);
 
 	std::cout << "Critical Path : " << crit_path << " ns\n";
+
+	*/
+
+	std::vector<std::string> file_lines = read_file_to_strings("474a_circuit2.txt");
+
+	std::vector<Operation> operations;
+	std::vector<std::string> output_lines = parse_netlist_lines(file_lines, "474a_circuit2.txt", operations);
+
+	write_strings_to_file(output_lines, "output_test.v");
 
 	return 0;
 }

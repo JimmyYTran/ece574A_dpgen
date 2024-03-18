@@ -171,47 +171,43 @@ std::string create_module_instance_from_line
 	// Keep track of the module, then concatenate to the verilog line
 	Operation current_op = parse_line_to_operation(split_line, module_type, ports);
 	operations.push_back(current_op);
-	veri_line += module_type.substr(0, module_type.find_first_of("><+"));
+	veri_line += module_type.substr(0, module_type.find_first_of("><="));
 
-	// add that here
-	for (const auto& input : current_op.get_inputs()) {
-		if (input.get_name() == "COMP")
+	int op_datawidth = 0;
+
+	// If current operation is comparator, then find max datawidth between inputs
+	if ((current_op.get_name().compare("COMP") == 0) || (current_op.get_name().compare("COMP<") == 0) || (current_op.get_name().compare("COMP==") == 0))
+	{
+		std::string concatenate = "";
+		int datawidth_diff = current_op.get_inputs().at(0).get_datawidth() - current_op.get_inputs().at(1).get_datawidth();
+		if (datawidth_diff < 0)
 		{
-
+			op_datawidth = current_op.get_inputs().at(1).get_datawidth();
+		}
+		else if (datawidth_diff > 0)
+		{
+			op_datawidth = current_op.get_inputs().at(0).get_datawidth();
+		}
+		else
+		{
+			op_datawidth = current_op.get_inputs().at(0).get_datawidth();
 		}
 	}
-	if (current_op.get_inputs()
-		== "COMP") {
+
+	else // If not a comparator, find datawidth of output
+	{
+		op_datawidth = current_op.get_output().get_datawidth();
 
 	}
 
-	// op.compare("-") == 0)
-
-	// if data widths are not, append to start of 
-	// go into inputs, check data width, 
-	// if inputs are too small, add 0s
-	// if inputs are too big, trim down the most significant bits
-
-	// add an s in front of the module name if it is signed
+	std::string datawidth_call = " #(.DATAWIDTH(" + std::to_string(op_datawidth) + "))";
+	veri_line += datawidth_call;
 
 	// Generate a unique name for the instantiation of the module
 	veri_line += " " + module_type.substr(0, 1) + std::to_string(line_num);
 
 	// Generate list of inputs/outputs/wires
 	veri_line += write_input_list(current_op);
-
-	/*
-	if (not comparator)
-		current_op.get_output().get_datawidth())
-
-	if (comparator)
-		current_op.get_input().
-
-	// ports = all inputs, outputs, and wires
-	// if module is a comparator (current_op name = "==", ")
-	//	go through current-op inputs
-	// check output
-	*/
 
 	veri_line += ";";
 	return veri_line;
@@ -230,29 +226,29 @@ std::string determine_module(std::vector<std::string> split_line)
 		return "REG";
 	}
 
-	std::string op = split_line[3];
+std::string op = split_line[3];
 
-	if (op.compare("+") == 0)
+if (op.compare("+") == 0)
+{
+	return split_line[4].compare("1") == 0 ? "INC" : "ADD";
+}
+else if (op.compare("-") == 0)
+{
+	return split_line[4].compare("1") == 0 ? "DEC" : "SUB";
+}
+else
+{
+	auto it = std::find(OPERATION_SYMBOLS.begin(), OPERATION_SYMBOLS.end(), op);
+	if (it != OPERATION_SYMBOLS.end())
 	{
-		return split_line[4].compare("1") == 0 ? "INC" : "ADD";
-	}
-	else if (op.compare("-") == 0)
-	{
-		return split_line[4].compare("1") == 0 ? "DEC" : "SUB";
+		int index = it - OPERATION_SYMBOLS.begin();
+		return MODULES[index];
 	}
 	else
 	{
-		auto it = std::find(OPERATION_SYMBOLS.begin(), OPERATION_SYMBOLS.end(), op);
-		if (it != OPERATION_SYMBOLS.end())
-		{
-			int index = it - OPERATION_SYMBOLS.begin();
-			return MODULES[index];
-		}
-		else
-		{
-			return "ERROR";
-		}
+		return "ERROR";
 	}
+}
 }
 
 /*
@@ -328,10 +324,47 @@ std::string write_input_list(Operation operation)
 
 	std::string input_list = "(";
 
-	// Add all of the inputs to the input list first
-	for (Data op_in : op_inputs)
+	// If the operation is a comparator
+	if ((op_output.get_name().compare("COMP>") == 0) || (op_output.get_name().compare("COMP<") == 0) || (op_output.get_name().compare("COMP==") == 0))
 	{
-		input_list += op_in.get_name() + ", ";
+		std::string concatenate = "";
+
+		int datawidth_diff = op_inputs.at(0).get_datawidth() - op_inputs.at(1).get_datawidth();
+		if (datawidth_diff < 0)
+		{
+			datawidth_diff = datawidth_diff * -1;
+			concatenate = "{{" + std::to_string(datawidth_diff) + "{b[" + std::to_string(datawidth_diff - 1) + "]}}," + op_inputs.at(0).get_name() + "}";
+		}
+		else if (datawidth_diff > 0)
+		{
+			concatenate = "{{" + std::to_string(datawidth_diff) + "{b[" + std::to_string(datawidth_diff - 1) + "]}}," + op_inputs.at(1).get_name() + "}";
+		}
+		input_list += concatenate + ", ";
+	}
+
+	else if (operation.get_name().compare("REG") != 0) // If operation is not a comparator nor a REG, add all of the inputs to the input list first
+	{
+		for (Data op_in : op_inputs)
+		{
+			int datawidth_diff = op_output.get_datawidth() - op_in.get_datawidth();
+			if (datawidth_diff > 0) // output datawidth is greater than input datawidth
+			{
+				std::string concatenate = "{{" + std::to_string(datawidth_diff) + "{b[" + std::to_string(datawidth_diff - 1) + "]}}," + op_in.get_name() + "}, ";
+				input_list += concatenate;
+			}
+			else
+			{
+				input_list += op_in.get_name() + ", ";
+			}
+		}
+	}
+
+	else
+	{
+		for (Data op_in : op_inputs)
+		{
+			input_list += op_in.get_name() + ", ";
+		}
 	}
 
 	// Add the output, but be extra careful with COMP
