@@ -38,7 +38,8 @@ std::vector<std::string> parse_netlist_lines
 		line_index++;
 	}
 
-	verilog_lines.insert(verilog_lines.begin(), write_module_definition(ports, filename));
+	std::string circuit_name = filename.substr(0, filename.find('.'));
+	verilog_lines.insert(verilog_lines.begin(), write_module_definition(ports, circuit_name));
 	verilog_lines.insert(verilog_lines.begin(), "`timescale 1ns / 1ps");
 	verilog_lines.push_back("endmodule");
 
