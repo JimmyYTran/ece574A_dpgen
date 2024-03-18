@@ -3,7 +3,7 @@
 #include <vector>
 
 double get_weight(Operation op) {
-    std::string name = op.get_name();
+    std::string name = op.get_name().substr(0, op.get_name().find_first_of("><+"));
     int width = op.get_output().get_datawidth();
     if (name == "COMP") {
         auto inputs = op.get_inputs();
