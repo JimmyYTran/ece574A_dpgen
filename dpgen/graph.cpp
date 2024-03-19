@@ -64,9 +64,9 @@ std::vector<Node> create_graph(std::vector<Operation> ops) {
     return nodes;
 }
 
-bool find_id(Node* start, Node* end, int id) {
+bool find_id(std::vector<Node*>::iterator start, std::vector<Node*>::iterator end, int id) {
     while (start != end) {
-        if (start->id == id) {
+        if ((*start)->id == id) {
             return true;
         }
         start++;
