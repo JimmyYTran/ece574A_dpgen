@@ -64,6 +64,16 @@ std::vector<Node> create_graph(std::vector<Operation> ops) {
     return nodes;
 }
 
+bool find_id(Node* start, Node* end, int id) {
+    while (start != end) {
+        if (start->id == id) {
+            return true;
+        }
+        start++;
+    }
+    return false;
+}
+
 std::vector<Node*> do_topological_sort(std::vector<Node> graph)
 {
     int num_nodes = graph.size();
