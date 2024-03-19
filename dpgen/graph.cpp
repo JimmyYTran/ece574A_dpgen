@@ -64,9 +64,9 @@ std::vector<Node> create_graph(std::vector<Operation> ops) {
     return nodes;
 }
 
-bool find_id(std::vector<Node*>::iterator start, std::vector<Node*>::iterator end, int id) {
+bool find_id(std::vector<Node>::iterator start, std::vector<Node>::iterator end, int id) {
     while (start != end) {
-        if ((*start)->id == id) {
+        if ((*start).id == id) {
             return true;
         }
         start++;
@@ -74,11 +74,11 @@ bool find_id(std::vector<Node*>::iterator start, std::vector<Node*>::iterator en
     return false;
 }
 
-std::vector<Node*> do_topological_sort(std::vector<Node> graph)
+std::vector<Node> do_topological_sort(std::vector<Node> graph)
 {
     int num_nodes = graph.size();
     // Sort nodes by their dependencies (this should technically be a stack but eh)
-    std::vector<Node*> sorted_nodes;
+    std::vector<Node> sorted_nodes;
 
     // First, get all nodes that don't have inputs
     for (Node& current_node : graph)
@@ -86,7 +86,7 @@ std::vector<Node*> do_topological_sort(std::vector<Node> graph)
         if (current_node.inputs.size() == 0)
         {
             std::cout << current_node.component.get_name() << "\n";
-            sorted_nodes.push_back(&current_node);
+            sorted_nodes.push_back(current_node);
         }
     }
 
@@ -96,7 +96,7 @@ std::vector<Node*> do_topological_sort(std::vector<Node> graph)
     {
         for (Node& current_node : graph)
         {
-            if (std::find(sorted_nodes.begin(), sorted_nodes.end(), &current_node) != sorted_nodes.end())
+            if (find_id(sorted_nodes.begin(), sorted_nodes.end(), current_node.id))
             {
                 continue;
             }
@@ -104,7 +104,7 @@ std::vector<Node*> do_topological_sort(std::vector<Node> graph)
             for (Node* in_p : current_node.inputs)
             {
                 // If input node is not found in sorted_nodes, move on
-                if (std::find(sorted_nodes.begin(), sorted_nodes.end(), in_p) == sorted_nodes.end())
+                if (!find_id(sorted_nodes.begin(), sorted_nodes.end(), in_p->id))
                 {
                     is_not_dependent = false;
                 }
@@ -114,7 +114,7 @@ std::vector<Node*> do_topological_sort(std::vector<Node> graph)
             // If all input nodes are in sorted_node, then the current_node has no dependencies
             if (is_not_dependent) {
                 std::cout << sorted_nodes.size() << "\n";
-                sorted_nodes.push_back(&current_node);
+                sorted_nodes.push_back(current_node);
             }
 
             // Reset the dependency check flag
@@ -127,16 +127,19 @@ std::vector<Node*> do_topological_sort(std::vector<Node> graph)
 
 float calculate_critical_path(std::vector<Node> graph)
 {
-    std::vector<Node*> sorted_nodes = do_topological_sort(graph);
+    std::vector<Node> sorted_nodes = do_topological_sort(graph);
+    for (Node node : sorted_nodes)
+    {
+        std::cout << node.component.get_name() << ", " << node.id << "\n";
+        std::cout << node.weight << "\n";
+    }
 
     float max_weight = 0.0;
     float critical_path = 0.0;
 
-    for (Node* node_p : sorted_nodes)
+    for (Node& current_node : sorted_nodes)
     {
-        Node current_Node = *node_p;
-
-        for (Node* input : current_Node.inputs)
+        for (Node* input : current_node.inputs)
         {
             Node current_input = *input;
             if (current_input.weight > max_weight)
@@ -147,7 +150,13 @@ float calculate_critical_path(std::vector<Node> graph)
 
         // TODO: PLEASE check that the dereferenced pointer works here, should overwrite old weight
         // Add the node's current weight to the largest input weight
-        current_Node.weight += max_weight;
+        current_node.weight += max_weight;
+    }
+
+    std::cout << "\n";
+    for (Node node : sorted_nodes)
+    {
+        std::cout << node.weight << "\n";
     }
 
     // Check the weights of REG nodes and terminal nodes (nodes without outputs)

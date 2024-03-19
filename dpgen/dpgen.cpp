@@ -51,20 +51,13 @@ int main(/*int argc, char* argv[]*/)
 		}
 	}
 
-	//float critical_path = calculate_critical_path(netlist_graph);
+	float critical_path = calculate_critical_path(netlist_graph);
 
-	std::vector<Node*> sorted_nodes = do_topological_sort(netlist_graph);
+	//std::vector<Node*> sorted_nodes = do_topological_sort(netlist_graph);
 
-	for (Node* node : sorted_nodes)
-	{
-		std::cout << node->component.get_name() << "\n";
-	}
-
-	/*
 	std::string crit_path = std::to_string(critical_path);
 
 	std::cout << "Critical Path : " << crit_path << " ns\n";
-	*/
 
 	return 0;
 }
