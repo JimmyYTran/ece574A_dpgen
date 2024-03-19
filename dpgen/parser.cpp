@@ -175,6 +175,15 @@ std::string create_module_instance_from_line
 	// Keep track of the module, then concatenate to the verilog line
 	Operation current_op = parse_line_to_operation(split_line, module_type, ports);
 	operations.push_back(current_op);
+
+	if (current_op.get_inputs().at(0).get_is_signed() == true || current_op.get_inputs().at(1).get_is_signed() == true || current_op.get_output().get_is_signed() == true)
+	{
+		if ((current_op.get_name().compare("MUX2x1") != 0) && (current_op.get_name().compare("REG") != 0))
+		{
+			veri_line += "S";
+		}
+	}
+
 	veri_line += module_type.substr(0, module_type.find_first_of("><="));
 
 	int op_datawidth = 0;
