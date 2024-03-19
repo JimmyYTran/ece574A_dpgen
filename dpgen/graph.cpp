@@ -44,7 +44,7 @@ std::vector<Node> create_graph(std::vector<Operation> ops) {
     std::vector<Node> nodes;
 
     for (int i = 0; i < ops.size(); i++) {
-        nodes.push_back(Node(ops[i], get_weight(ops[i])));
+        nodes.push_back(Node(ops[i], get_weight(ops[i]), i));
     }
 
     for (int i1 = 0; i1 < ops.size(); i1++) {

@@ -19,13 +19,15 @@ static const float DELAYS[12][6] = { {2.616, 2.644, 2.879, 3.061, 3.602, 3.966},
 };
 
 struct Node {
-    Node(Operation c, double w) {
+    Node(Operation c, double w, int i) {
         component = c;
         weight = w;
+        id = i;
     } 
     Operation component;
     std::vector<Node*> inputs;
     std::vector<Node*> outputs;
+    int id;
     double weight;
 };
 
