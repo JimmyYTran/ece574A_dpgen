@@ -1,6 +1,7 @@
 #include "graph.h"
 #include "Operation.h"
 #include <vector>
+#include <iostream>
 
 double get_weight(Operation op) {
     std::string name = op.get_name().substr(0, op.get_name().find_first_of("><+"));
@@ -70,10 +71,11 @@ std::vector<Node*> do_topological_sort(std::vector<Node> graph)
     std::vector<Node*> sorted_nodes;
 
     // First, get all nodes that don't have inputs
-    for (Node current_node : graph)
+    for (Node& current_node : graph)
     {
         if (current_node.inputs.size() == 0)
         {
+            std::cout << current_node.component.get_name() << "\n";
             sorted_nodes.push_back(&current_node);
         }
     }
@@ -82,21 +84,26 @@ std::vector<Node*> do_topological_sort(std::vector<Node> graph)
     bool is_not_dependent = true;
     while (sorted_nodes.size() != num_nodes)
     {
-        for (Node current_node : graph)
+        for (Node& current_node : graph)
         {
+            if (std::find(sorted_nodes.begin(), sorted_nodes.end(), &current_node) != sorted_nodes.end())
+            {
+                continue;
+            }
             // Check that all inputs are in the sorted_nodes
             for (Node* in_p : current_node.inputs)
             {
                 // If input node is not found in sorted_nodes, move on
-                if (is_not_dependent &&
-                    std::find(sorted_nodes.begin(), sorted_nodes.end(), in_p) == sorted_nodes.end())
+                if (std::find(sorted_nodes.begin(), sorted_nodes.end(), in_p) == sorted_nodes.end())
                 {
                     is_not_dependent = false;
                 }
             }
+            //std::cout << is_not_dependent << "\n";
 
             // If all input nodes are in sorted_node, then the current_node has no dependencies
             if (is_not_dependent) {
+                std::cout << sorted_nodes.size() << "\n";
                 sorted_nodes.push_back(&current_node);
             }
 
