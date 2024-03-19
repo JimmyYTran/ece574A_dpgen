@@ -85,7 +85,6 @@ std::vector<Node> do_topological_sort(std::vector<Node> graph)
     {
         if (current_node.inputs.size() == 0)
         {
-            std::cout << current_node.component.get_name() << "\n";
             sorted_nodes.push_back(current_node);
         }
     }
@@ -113,7 +112,6 @@ std::vector<Node> do_topological_sort(std::vector<Node> graph)
 
             // If all input nodes are in sorted_node, then the current_node has no dependencies
             if (is_not_dependent) {
-                std::cout << sorted_nodes.size() << "\n";
                 sorted_nodes.push_back(current_node);
             }
 
@@ -147,12 +145,6 @@ float calculate_critical_path(std::vector<Node> graph)
         }
     }
 
-    for (Node node : sorted_nodes)
-    {
-        std::cout << node.component.get_name() << ", " << node.id << "\n";
-        std::cout << node.weight << "\n";
-    }
-
     float max_weight = 0.0;
     float critical_path = 0.0;
 
@@ -172,14 +164,8 @@ float calculate_critical_path(std::vector<Node> graph)
         current_node.weight += max_weight;
     }
 
-    std::cout << "\n";
-    for (Node node : sorted_nodes)
-    {
-        std::cout << node.weight << "\n";
-    }
-
     // Check the weights of REG nodes and terminal nodes (nodes without outputs)
-    for (Node node : graph)
+    for (Node node : sorted_nodes)
     {
         if (node.component.get_name().compare("REG") == 0 || node.outputs.size() == 0)
         {

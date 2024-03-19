@@ -1,10 +1,11 @@
 #include "fileio.h"
 #include "parser.h"
 #include "graph.h"
+#include <iomanip>
 
-int main(/*int argc, char* argv[]*/)
+int main(int argc, char* argv[])
 {
-	/*
+	
 	if (argc != 3) {
 		std::cerr << "Usage: " << argv[0] << " netlistFile verilogFile" << std::endl;
 		return 1;
@@ -19,18 +20,21 @@ int main(/*int argc, char* argv[]*/)
 	std::vector<std::string> output_lines = parse_netlist_lines(file_lines, netlist_File, operations);
 
 	write_strings_to_file(output_lines, verilog_File);
-	*/
 
-	std::vector<std::string> file_lines = read_file_to_strings("474a_circuit3.txt");
+	std::vector<Node> netlist_graph = create_graph(operations);
+	
+	/*
+	std::string filename = "ucircuit1.txt";
+	std::vector<std::string> file_lines = read_file_to_strings(filename);
 
 	std::vector<Operation> operations;
-	std::vector<std::string> output_lines = parse_netlist_lines(file_lines, "474a_circuit3.txt", operations);
+	std::vector<std::string> output_lines = parse_netlist_lines(file_lines, filename, operations);
 
 	write_strings_to_file(output_lines, "output_test.v");
-
-	std::cout << "\n";
 	
 	std::vector<Node> netlist_graph = create_graph(operations);
+
+	
 	std::cout << "Number of nodes: " << std::to_string(netlist_graph.size()) << "\n";
 
 	for (Node node : netlist_graph)
@@ -50,14 +54,14 @@ int main(/*int argc, char* argv[]*/)
 			std::cout << "\t\tOutput for this is: " << prev_op.component.get_output().get_name() << "\n";
 		}
 	}
+	*/
 
 	float critical_path = calculate_critical_path(netlist_graph);
 
 	//std::vector<Node*> sorted_nodes = do_topological_sort(netlist_graph);
 
-	std::string crit_path = std::to_string(critical_path);
-
-	std::cout << "Critical Path : " << crit_path << " ns\n";
+	std::cout << std::fixed << std::setprecision(3);
+	std::cout << "Critical Path : " << critical_path << " ns\n";
 
 	return 0;
 }

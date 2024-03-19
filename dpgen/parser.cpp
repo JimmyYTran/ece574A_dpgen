@@ -176,9 +176,19 @@ std::string create_module_instance_from_line
 	Operation current_op = parse_line_to_operation(split_line, module_type, ports);
 	operations.push_back(current_op);
 
-	if (current_op.get_inputs().at(0).get_is_signed() == true || current_op.get_inputs().at(1).get_is_signed() == true || current_op.get_output().get_is_signed() == true)
+	if (current_op.get_name().compare("INC") == 0 || current_op.get_name().compare("DEC") == 0)
 	{
-		if ((current_op.get_name().compare("MUX2x1") != 0) && (current_op.get_name().compare("REG") != 0))
+		if (current_op.get_inputs().at(0).get_is_signed())
+		{
+			veri_line += "S";
+		}
+	}
+	else if (current_op.get_inputs().at(0).get_is_signed() || current_op.get_inputs().at(1).get_is_signed())
+	{
+		if ((current_op.get_name().compare("MUX2x1") != 0) && 
+			(current_op.get_name().compare("REG") != 0) &&
+			(current_op.get_name().compare("SHL") != 0) &&
+			(current_op.get_name().compare("SHL") != 0))
 		{
 			veri_line += "S";
 		}
