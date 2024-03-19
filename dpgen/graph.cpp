@@ -128,6 +128,25 @@ std::vector<Node> do_topological_sort(std::vector<Node> graph)
 float calculate_critical_path(std::vector<Node> graph)
 {
     std::vector<Node> sorted_nodes = do_topological_sort(graph);
+    std::vector<Node*> unsorted;
+
+    for(int i = 0; i < sorted_nodes.size(); i++) {
+        for(int j = 0; j < sorted_nodes.size(); j++) {
+            if (sorted_nodes[j].id == i) {
+                unsorted.push_back(&sorted_nodes[j]);
+            }
+        }
+    }
+
+    for (int i = 0; i < sorted_nodes.size(); i++) {
+        for (int n = 0; n < sorted_nodes[i].inputs.size(); n++) {
+            sorted_nodes[i].inputs[n] = unsorted[sorted_nodes[i].inputs[n]->id];
+        }
+        for (int n = 0; n < sorted_nodes[i].outputs.size(); n++) {
+            sorted_nodes[i].outputs[n] = unsorted[sorted_nodes[i].outputs[n]->id];
+        }
+    }
+
     for (Node node : sorted_nodes)
     {
         std::cout << node.component.get_name() << ", " << node.id << "\n";
