@@ -6,7 +6,7 @@ message("Started cmake on ${PROJECT_NAME}.")
 
 if ( CMAKE_COMPILER_IS_GNUCC )
     message("GNUCC compiler flags enabled...")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Werror -std=gnu++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 endif( CMAKE_COMPILER_IS_GNUCC )
 if ( MSVC )
     message("MSVC compiler flags enabled...")

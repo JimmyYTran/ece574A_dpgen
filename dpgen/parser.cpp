@@ -188,7 +188,7 @@ std::string create_module_instance_from_line
 		if ((current_op.get_name().compare("MUX2x1") != 0) && 
 			(current_op.get_name().compare("REG") != 0) &&
 			(current_op.get_name().compare("SHL") != 0) &&
-			(current_op.get_name().compare("SHL") != 0))
+			(current_op.get_name().compare("SHR") != 0))
 		{
 			veri_line += "S";
 		}
