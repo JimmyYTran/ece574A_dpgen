@@ -19,6 +19,11 @@ int main(int argc, char* argv[])
 	std::vector<Operation> operations;
 	std::vector<std::string> output_lines = parse_netlist_lines(file_lines, netlist_File, operations);
 
+	if (output_lines.size() == 0)
+	{
+		return 1;
+	}
+
 	write_strings_to_file(output_lines, verilog_File);
 
 	std::vector<Node> netlist_graph = create_graph(operations);

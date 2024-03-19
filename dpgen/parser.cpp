@@ -33,8 +33,15 @@ std::vector<std::string> parse_netlist_lines
 
 	while (line_index < lines.size())
 	{
-		verilog_lines.push_back("\t" +
-			create_module_instance_from_line(lines[line_index], line_index, ports, operations));
+		std::string module_line = create_module_instance_from_line(lines[line_index], line_index, ports, operations);
+
+		if (module_line.compare("ERROR") == 0)
+		{
+			std::cout << "Found error.\n";
+			return std::vector<std::string>();
+		}
+
+		verilog_lines.push_back("\t" + module_line);
 		line_index++;
 	}
 
@@ -171,6 +178,10 @@ std::string create_module_instance_from_line
 
 	// Determine the module to instantiate
 	std::string module_type = determine_module(split_line);
+	if (module_type.compare("ERROR") == 0)
+	{
+		return "ERROR";
+	}
 
 	// Keep track of the module, then concatenate to the verilog line
 	Operation current_op = parse_line_to_operation(split_line, module_type, ports);
