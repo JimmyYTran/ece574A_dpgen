@@ -15,9 +15,13 @@ int main(int argc, char* argv[])
 	std::string verilog_File = argv[2];
 
 	std::vector<std::string> file_lines = read_file_to_strings(netlist_File);
+	if (file_lines.size() == 0)
+	{
+		return 1;
+	}
 
 	std::vector<Operation> operations;
-	std::vector<std::string> output_lines = parse_netlist_lines(file_lines, netlist_File, operations);
+	std::vector<std::string> output_lines = parse_netlist_lines(file_lines, verilog_File, operations);
 
 	if (output_lines.size() == 0)
 	{

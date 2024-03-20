@@ -24,6 +24,13 @@ std::vector<std::string> parse_netlist_lines
 	int line_index = 0;
 	std::vector<Data> ports;
 
+	// For registers, need Clk and Rst
+	Data clk_in = Data("Clk", "input", 1, false);
+	Data rst_in = Data("Rst", "input", 1, false);
+	ports.push_back(clk_in);
+	ports.push_back(rst_in);
+	verilog_lines.push_back("\tinput Clk, Rst;");
+
 	// Write the port declarations, while also keeping track of inputs/outputs/wires
 	while (line_index < lines.size() && lines[line_index].find("=") == std::string::npos)
 	{
@@ -183,8 +190,12 @@ std::string create_module_instance_from_line
 		return "ERROR";
 	}
 
-	// Keep track of the module, then concatenate to the verilog line
+	// Keep track of the module, then concatenate to the verilog line if all inputs found
 	Operation current_op = parse_line_to_operation(split_line, module_type, ports);
+	if (current_op.get_name().compare("ERROR") == 0)
+	{
+		return "ERROR";
+	}
 	operations.push_back(current_op);
 
 	if (current_op.get_name().compare("INC") == 0 || current_op.get_name().compare("DEC") == 0)
@@ -260,29 +271,29 @@ std::string determine_module(std::vector<std::string> split_line)
 		return "REG";
 	}
 
-std::string op = split_line[3];
+	std::string op = split_line[3];
 
-if (op.compare("+") == 0)
-{
-	return split_line[4].compare("1") == 0 ? "INC" : "ADD";
-}
-else if (op.compare("-") == 0)
-{
-	return split_line[4].compare("1") == 0 ? "DEC" : "SUB";
-}
-else
-{
-	auto it = std::find(OPERATION_SYMBOLS.begin(), OPERATION_SYMBOLS.end(), op);
-	if (it != OPERATION_SYMBOLS.end())
+	if (op.compare("+") == 0)
 	{
-		int index = it - OPERATION_SYMBOLS.begin();
-		return MODULES[index];
+		return split_line[4].compare("1") == 0 ? "INC" : "ADD";
+	}
+	else if (op.compare("-") == 0)
+	{
+		return split_line[4].compare("1") == 0 ? "DEC" : "SUB";
 	}
 	else
 	{
-		return "ERROR";
+		auto it = std::find(OPERATION_SYMBOLS.begin(), OPERATION_SYMBOLS.end(), op);
+		if (it != OPERATION_SYMBOLS.end())
+		{
+			int index = it - OPERATION_SYMBOLS.begin();
+			return MODULES[index];
+		}
+		else
+		{
+			return "ERROR";
+		}
 	}
-}
 }
 
 /*
@@ -296,6 +307,15 @@ else
 Operation parse_line_to_operation
 (std::vector<std::string> split_line, std::string module_type, std::vector<Data>& ports)
 {
+	// Check for missing ports; if missing, there's an error
+	for (int i = 0; i < split_line.size(); i = i + 2)
+	{
+		if (find_port(ports, split_line[i]) == -1)
+		{
+			return Operation("ERROR");
+		}
+	}
+
 	// Construct a new operation from the module_type
 	Operation new_op = Operation(module_type);
 	int input_index;
