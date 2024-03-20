@@ -132,7 +132,14 @@ std::string create_port_declaration_from_line(std::string line, std::vector<Data
 
 	// Determine the type of port (input/output/wire)
 	datatype = split_line[0];
-	veri_line += datatype;
+	if (datatype.compare("register") == 0)
+	{
+		veri_line += "reg";
+	}
+	else
+	{
+		veri_line += datatype;
+	}
 
 	// Determine if the port is signed
 	if (split_line[1].at(0) != 'U')
@@ -308,7 +315,12 @@ Operation parse_line_to_operation
 (std::vector<std::string> split_line, std::string module_type, std::vector<Data>& ports)
 {
 	// Check for missing ports; if missing, there's an error
-	for (int i = 0; i < split_line.size(); i = i + 2)
+	int port_num = split_line.size();
+	if (module_type.compare("INC") == 0 || module_type.compare("DEC") == 0)
+	{
+		port_num -= 2;
+	}
+	for (int i = 0; i < port_num; i = i + 2)
 	{
 		if (find_port(ports, split_line[i]) == -1)
 		{
@@ -354,7 +366,7 @@ Operation parse_line_to_operation
 	}
 	else
 	{
-		for (int i = 2; i < split_line.size(); i = i + 2)
+		for (int i = 2; i < port_num; i = i + 2)
 		{
 			input_index = find_port(ports, split_line[i]);
 			ports.push_back(ports[input_index]);
